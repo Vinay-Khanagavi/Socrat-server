@@ -25,6 +25,7 @@ system_message = {
         "steer the conversation in a productive direction."
     )
 }
+GROK_API_KEY=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
 
 @app.route("/chat", methods=["POST"])
 def chat():
