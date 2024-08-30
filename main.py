@@ -5,9 +5,14 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-os.environ["GROQ_API_KEY"] = "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"
+# Get the API key from environment variable
+groq_api_key = os.getenv("GROQ_API_KEY")
 
-client = Groq()
+# Check if the API key is set
+if not groq_api_key:
+    raise ValueError("GROQ_API_KEY environment variable is not set")
+
+client = Groq(api_key=groq_api_key)
 
 system_message = {
     "role": "system",
@@ -25,7 +30,6 @@ system_message = {
         "steer the conversation in a productive direction."
     )
 }
-GROK_API_KEY=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
 
 @app.route("/chat", methods=["POST"])
 def chat():
