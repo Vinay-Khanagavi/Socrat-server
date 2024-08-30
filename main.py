@@ -1,12 +1,16 @@
+from flask import Flask, request, jsonify
 from groq import Groq
 import os 
+from datetime import datetime
+
+app = Flask(__name__)
 
 os.environ["GROQ_API_KEY"] = "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"
 
 client = Groq()
 
 system_message = {
-    "role":"system",
+    "role": "system",
     "content": (
         "You are an AI tutor that teaches Data Structures and Algorithms using the Socratic method. "
         "Your primary goal is to guide the student to understand concepts by asking insightful and open-ended questions. "
@@ -22,30 +26,28 @@ system_message = {
     )
 }
 
-while True:
-    user_input= input("You: ")
-    
-    # exit if user type exit 
-    if user_input.lower() == "exit":
-        break
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_input = request.json.get("message", "")
     
     user_message = {
-        "role":"user",
+        "role": "user",
         "content": user_input
     }
     
     completion = client.chat.completions.create(
-        model="llama3-70b-8192",
+        model="mixtral-8x7b-32768",
         messages=[system_message, user_message],
         temperature=1,
         max_tokens=1024,
         top_p=1,
-        stream=True,
+        stream=False,
         stop=None,
     )
     
-    print("AI :", end="")
-
-    for chunk in completion:
-        print(chunk.choices[0].delta.content or "", end="")
-    print() # for new line
+    ai_response = completion.choices[0].message.content
+    
+    return jsonify({"response": ai_response})
+    
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
